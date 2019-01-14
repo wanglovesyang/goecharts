@@ -66,7 +66,7 @@ func extractXAxisData(x, y interface{}) (ret interface{}, reterr error) {
 
 		reterr = fmt.Errorf("are you kidding me?")
 	default:
-		if tp := reflect.TypeOf(x).Kind(); tp == reflect.Array {
+		if tp := reflect.TypeOf(x).Kind(); tp == reflect.Slice {
 			ret = x
 			return
 		}
