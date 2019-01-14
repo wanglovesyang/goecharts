@@ -48,6 +48,8 @@ func (e *Chart) RenderJupyter() (ret string) {
 
 	ret = strings.Replace(ret, "${chart_opt}", string(optStr), -1)
 	ret = strings.Replace(ret, "${chart_id}", chartSig, -1)
+
+	Log(ret)
 	return
 }
 
