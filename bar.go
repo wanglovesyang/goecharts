@@ -132,7 +132,7 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 			return
 		}
 
-		if err := json.Unmarshal(jdt, bp); err != nil {
+		if err := json.Unmarshal(jdt, &bp); err != nil {
 			reterr = err
 			return
 		}
