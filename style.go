@@ -29,3 +29,10 @@ var defaultColorSet = []string{
 	"#918597",
 	"#f6f5ec",
 }
+
+func SmoothedSeries(data []float32, name string, seriesType string) (ret *Series) {
+	ret = DefaultSeries(data, name, seriesType)
+	ret.Smooth = true
+
+	return ret
+}

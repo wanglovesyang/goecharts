@@ -3,6 +3,11 @@ package goecharts
 import "encoding/json"
 
 type CurveSettings struct {
+	Title  string `json:"title"`
+	Smooth bool   `json:"smooth"`
+}
+
+type CurveSettings2 struct {
 	Title string `json:"title"`
 }
 
@@ -45,7 +50,11 @@ func Curve(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 		return
 	}
 
-	series, reterr := extractSeries(x, y, DefaultSeries, "line")
+	curveMaker := DefaultSeries
+	if bp.Smooth {
+		curveMaker = SmoothedSeries
+	}
+	series, reterr := extractSeries(x, y, curveMaker, "line")
 	if reterr != nil {
 		return
 	}

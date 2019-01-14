@@ -307,6 +307,7 @@ type Series struct {
 	Label       *SeriesLabelModes `json:"label,omitempty"`
 	MarkPoint   *MarkPointModes   `json:"markPoint,omitempty"`
 	MarkLine    *MarkLineModes    `json:"markLine,omitempty"`
+	Smooth      bool              `json:"smooth"`
 }
 
 type MarkPoint struct {
