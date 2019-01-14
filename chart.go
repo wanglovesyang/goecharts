@@ -46,6 +46,7 @@ func (e *Chart) RenderJupyter() (ret string) {
 	sm := md5.Sum([]byte(chartID))
 	chartSig := h.EncodeToString(sm[0:16])
 
+	ret = template
 	ret = strings.Replace(ret, "${chart_opt}", string(optStr), -1)
 	ret = strings.Replace(ret, "${chart_id}", chartSig, -1)
 
@@ -54,14 +55,15 @@ func (e *Chart) RenderJupyter() (ret string) {
 }
 
 type ChartOption struct {
-	Title     []*Title  `json:"title"`
-	ToolBox   *ToolBox  `json:"toolbox"`
-	ToolTip   *ToolTip  `json:"tooltip"`
-	Series    []*Series `json:"series"`
-	Animation bool      `json:"animation"`
-	XAxis     []*XAxis  `json:"xAxis"`
-	YAxis     []*YAxis  `json:"yAxis"`
-	Legend    []*Legend `json:"legend"`
+	Title     []*Title  `json:"title,omitempty"`
+	ToolBox   *ToolBox  `json:"toolbox,omitempty"`
+	ToolTip   *ToolTip  `json:"tooltip,omitempty"`
+	Series    []*Series `json:"series,omitempty"`
+	Animation bool      `json:"animation,omitempty"`
+	XAxis     []*XAxis  `json:"xAxis,omitempty"`
+	YAxis     []*YAxis  `json:"yAxis,omitempty"`
+	Legend    []*Legend `json:"legend,omitempty"`
+	Color     []string  `json:"color,ommitempty"`
 }
 
 /*
@@ -80,17 +82,17 @@ type ChartOption struct {
 */
 
 type TextStyle struct {
-	FontSize int32  `json:"frontSize"`
-	Color    string `json:"color"`
+	FontSize int32  `json:"frontSize,omitempty"`
+	Color    string `json:"color,omitempty"`
 }
 
 type Title struct {
 	Text         string     `json:"text"`
-	SubText      string     `json:"subtext"`
-	LeftMode     string     `json:"left"`
-	TopMode      string     `json:"top"`
-	TextStyle    *TextStyle `json:"textStyle"`
-	SubTextStyle *TextStyle `json:"subTextStyle"`
+	SubText      string     `json:"subtext,omitempty"`
+	LeftMode     string     `json:"left,omitempty"`
+	TopMode      string     `json:"top,omitempty"`
+	TextStyle    *TextStyle `json:"textStyle,omitempty"`
+	SubTextStyle *TextStyle `json:"subTextStyle,omitempty"`
 }
 
 func DefaultTitle(title string) *Title {
@@ -129,19 +131,19 @@ func DefaultTitle(title string) *Title {
 
 type ToolBoxFeature struct {
 	Show  bool   `json:"show"`
-	Title string `json:"title"`
+	Title string `json:"title,omitempty"`
 }
 
 type ToolBox struct {
 	Show        bool                      `json:"show"`
-	Orientation string                    `json:"orient"`
-	Left        string                    `json:"left"`
-	Top         string                    `json:"top"`
-	Feature     map[string]ToolBoxFeature `json:"feature"`
+	Orientation string                    `json:"orient,omitempty"`
+	Left        string                    `json:"left,omitempty"`
+	Top         string                    `json:"top,omitempty"`
+	Feature     map[string]ToolBoxFeature `json:"feature,omitempty"`
 }
 
 type AxisPointer struct {
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 }
 
 func DefaultToolBox() *ToolBox {
@@ -184,13 +186,13 @@ func DefaultToolBox() *ToolBox {
 */
 
 type ToolTip struct {
-	Trigger         string      `json:"trigger"`
-	TriggerOn       string      `json:"triggerOn"`
-	AxisPointer     AxisPointer `json:"axisPointer"`
-	TextStyle       TextStyle   `json:"textStyle"`
-	BackGroundColor string      `json:"backGroundColor"`
-	BorderColor     string      `json:"borderColor"`
-	BorderWidth     int32       `json:"borderWidth"`
+	Trigger         string      `json:"trigger,omitempty"`
+	TriggerOn       string      `json:"triggerOn,omitempty"`
+	AxisPointer     AxisPointer `json:"axisPointer,omitempty"`
+	TextStyle       TextStyle   `json:"textStyle,omitempty"`
+	BackGroundColor string      `json:"backGroundColor,omitempty"`
+	BorderColor     string      `json:"borderColor,omitempty"`
+	BorderWidth     int32       `json:"borderWidth,omitempty"`
 }
 
 func DefaultToolTip() *ToolTip {
@@ -287,46 +289,46 @@ func DefaultToolTip() *ToolTip {
 */
 
 type SeriesLabelModes struct {
-	Normal   *SeriesLabel `json:"normal"`
-	Emphasis *SeriesLabel `json:"emphasis"`
+	Normal   *SeriesLabel `json:"normal,omitempty"`
+	Emphasis *SeriesLabel `json:"emphasis,omitempty"`
 }
 
 type SeriesLabel struct {
 	Show      bool      `json:"show"`
-	Position  string    `json:"top"`
-	TextStyle TextStyle `json:"textStyle"`
+	Position  string    `json:"position,omitempty"`
+	TextStyle TextStyle `json:"textStyle,omitempty"`
 }
 
 type Series struct {
-	Type        string            `json:"type"`
-	Name        string            `json:"name"`
-	Data        []float32         `json:"data"`
-	CategoryGap string            `json:"barCategoryGap"`
-	Label       *SeriesLabelModes `json:"label"`
-	MarkPoint   *MarkPointModes   `json:"markPoint"`
-	MarkLine    *MarkLineModes    `json:"markLine"`
+	Type        string            `json:"type,omitempty"`
+	Name        string            `json:"name,omitempty"`
+	Data        []float32         `json:"data,omitempty"`
+	CategoryGap string            `json:"barCategoryGap,omitempty"`
+	Label       *SeriesLabelModes `json:"label,omitempty"`
+	MarkPoint   *MarkPointModes   `json:"markPoint,omitempty"`
+	MarkLine    *MarkLineModes    `json:"markLine,omitempty"`
 }
 
 type MarkPoint struct {
-	Type       string            `json:"type"`
-	Name       string            `json:"name"`
-	Symbol     string            `json:"symbol"`
-	SymbolSize int32             `json:"symbolSize"`
-	Label      *SeriesLabelModes `json:"label"`
+	Type       string            `json:"type,omitempty"`
+	Name       string            `json:"name,omitempty"`
+	Symbol     string            `json:"symbol,omitempty"`
+	SymbolSize int32             `json:"symbolSize,omitempty"`
+	Label      *SeriesLabelModes `json:"label,omitempty"`
 }
 
 type MarkPointModes struct {
-	Data []MarkPoint `json:"data"`
+	Data []MarkPoint `json:"data,omitempty"`
 }
 
 type MarkLine struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
+	Type string `json:"type,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type MarkLineModes struct {
-	Data       []MarkLine `json:"data"`
-	SymbolSize int32      `json:"symbolSize"`
+	Data       []MarkLine `json:"data,omitempty"`
+	SymbolSize int32      `json:"symbolSize,omitempty"`
 }
 
 func DefaultSeries(data []float32, name string, seriesType string) *Series {
@@ -389,7 +391,6 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 					Type: "average",
 					Name: "mean-value",
 				},
-				MarkLine{},
 			},
 			SymbolSize: 10,
 		},
@@ -447,40 +448,40 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 
 type XAxis struct {
 	Show          bool        `json:"show"`
-	NameLoc       string      `json:"nameLocation"`
-	NameGap       float32     `json:"nameGap"`
-	NameTextStyle *TextStyle  `json:"nameTextStyle"`
-	Inverse       bool        `json:"inverse"`
-	BoundaryGap   bool        `json:"boundaryGap"`
-	Type          string      `json:"type"`
-	SplitLine     *SplitLine  `json:"splitLine"`
-	AxisLine      *AxisLine   `json:"axisLine"`
-	AxisLabel     *AxisLabel  `json:"axisLabel"`
-	Data          interface{} `json:"data"`
+	NameLoc       string      `json:"nameLocation,omitempty"`
+	NameGap       float32     `json:"nameGap,omitempty"`
+	NameTextStyle *TextStyle  `json:"nameTextStyle,omitempty"`
+	Inverse       bool        `json:"inverse,omitempty"`
+	BoundaryGap   bool        `json:"boundaryGap,omitempty"`
+	Type          string      `json:"type,omitempty"`
+	SplitLine     *SplitLine  `json:"splitLine,omitempty"`
+	AxisLine      *AxisLine   `json:"axisLine,omitempty"`
+	AxisLabel     *AxisLabel  `json:"axisLabel,omitempty"`
+	Data          interface{} `json:"data,omitempty"`
 }
 
 type SplitLine struct {
-	Show bool
+	Show bool `json:"show,omitempty"`
 }
 
 type AxisTick struct {
-	AlignWithLabel bool `json:"aligWithLabel"`
+	AlignWithLabel bool `json:"alignWithLabel,omitempty"`
 }
 
 type AxisLine struct {
-	LineStyle *LineStyle `json:"lineStyle"`
+	LineStyle *LineStyle `json:"lineStyle,omitempty"`
 }
 
 type LineStyle struct {
-	Width float32 `json:"lineStyle"`
+	Width float32 `json:"width,omitempty"`
 }
 
 type AxisLabel struct {
-	Interval  string     `json:"interval"`
-	Formater  string     `json:"formater"`
-	Rotate    float32    `json:"rotate"`
-	Margin    float32    `json:"margin"`
-	TextStyle *TextStyle `json:"textSyle"`
+	Interval  string     `json:"interval,omitempty"`
+	Formater  string     `json:"formatter,omitempty"`
+	Rotate    float32    `json:"rotate,omitempty"`
+	Margin    float32    `json:"margin,omitempty"`
+	TextStyle *TextStyle `json:"textSyle,omitempty"`
 }
 
 func DefaultXAxisCategory(data interface{}) *XAxis {
@@ -552,16 +553,16 @@ func DefaultXAxisCategory(data interface{}) *XAxis {
 
 type YAxis struct {
 	Show          bool       `json:"show"`
-	NameLoc       string     `json:"nameLoc"`
-	NameGap       float32    `json:"nameGap"`
-	NameTextStyle *TextStyle `json:"nameTextStyle"`
-	AxisTick      *AxisTick  `json:"axisTick"`
-	Inverse       bool       `json:"inverse"`
-	BoundaryGap   bool       `json:"boundaryGap"`
-	Type          string     `json:"type"`
-	SplitLine     *SplitLine `json:"splitLine"`
-	AxisLine      *AxisLine  `json:"axisLine"`
-	AxisLabel     *AxisLabel `json:"axisLabel"`
+	NameLoc       string     `json:"nameLoc,omitempty"`
+	NameGap       float32    `json:"nameGap,omitempty"`
+	NameTextStyle *TextStyle `json:"nameTextStyle,omitempty"`
+	AxisTick      *AxisTick  `json:"axisTick,omitempty"`
+	Inverse       bool       `json:"inverse,omitempty"`
+	BoundaryGap   bool       `json:"boundaryGap,omitempty"`
+	Type          string     `json:"type,omitempty"`
+	SplitLine     *SplitLine `json:"splitLine,omitempty"`
+	AxisLine      *AxisLine  `json:"axisLine,omitempty"`
+	AxisLabel     *AxisLabel `json:"axisLabel,omitempty"`
 }
 
 func DefaultYAxis() *YAxis {
@@ -618,13 +619,13 @@ func DefaultYAxis() *YAxis {
 */
 
 type Legend struct {
-	Data        []string   `json:"data"`
-	SelectMode  string     `json:"selectMode"`
-	Show        bool       `json:"show"`
-	Left        string     `json:"center"`
-	Top         string     `json:"top"`
-	Orientation string     `json:"orient"`
-	TextStyle   *TextStyle `json:"textStyle"`
+	Data        []string   `json:"data,omitempty"`
+	SelectMode  string     `json:"selectMode,omitempty"`
+	Show        bool       `json:"show,omitempty"`
+	Left        string     `json:"center,omitempty"`
+	Top         string     `json:"top,omitempty"`
+	Orientation string     `json:"orient,omitempty"`
+	TextStyle   *TextStyle `json:"textStyle,omitempty"`
 }
 
 func DefaultLegend(names []string) *Legend {

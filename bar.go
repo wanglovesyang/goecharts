@@ -12,17 +12,32 @@ type BarSettings struct {
 	Title string `json:"title"`
 }
 
-func parseBarSettings(s interface{}) (ret *BarSettings) {
+func parseBarSettings(s interface{}) (ret *BarSettings, reterr error) {
 	switch a := s.(type) {
 	case BarSettings:
 		ret = &a
 	case *BarSettings:
 		ret = a
 	default:
-		jsonData, _ := json.Marshal(s)
-		json.Unmarshal(jsonData, &ret)
+		jsonData, err := json.Marshal(s)
+		if err != nil {
+			reterr = err
+			return
+		}
+		if err := json.Unmarshal(jsonData, &ret); err != nil {
+			reterr = err
+			return
+		}
 	}
 
+	return
+}
+
+func rangeNum(size int32) (ret []int32) {
+	ret = make([]int32, size)
+	for i := int32(0); i < size; i++ {
+		ret[i] = int32(i)
+	}
 	return
 }
 
@@ -77,17 +92,17 @@ func extractXAxisData(x, y interface{}) (ret interface{}, reterr error) {
 	return
 }
 
-func extractSeries(x, y interface{}, maker SeriesMaker) (ret []*Series, reterr error) {
+func extractSeries(x, y interface{}, maker SeriesMaker, tp string) (ret []*Series, reterr error) {
 	switch yy := y.(type) {
 	case []float32:
-		ret = []*Series{maker(yy, "", "bar")}
+		ret = []*Series{maker(yy, "-", tp)}
 	case map[string][]float32:
 		for k, v := range yy {
-			ret = append(ret, maker(v, k, "bar"))
+			ret = append(ret, maker(v, k, tp))
 		}
 	case [][]float32:
 		for k, v := range yy {
-			ret = append(ret, maker(v, fmt.Sprintf("s%d", k), "bar"))
+			ret = append(ret, maker(v, fmt.Sprintf("s%d", k), tp))
 		}
 	case *gf.DataFrame:
 		xx := x.(string)
@@ -105,7 +120,7 @@ func extractSeries(x, y interface{}, maker SeriesMaker) (ret []*Series, reterr e
 
 		for i, c := range cols {
 			if columns[i] != xx {
-				ret = append(ret, maker(c, columns[i], "bar"))
+				ret = append(ret, maker(c, columns[i], tp))
 			}
 		}
 	default:
@@ -123,19 +138,9 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 		}
 	}()
 
-	var bp *BarSettings
-	bp, suc := param.(*BarSettings)
-	if !suc {
-		jdt, err := json.Marshal(param)
-		if err != nil {
-			reterr = err
-			return
-		}
-
-		if err := json.Unmarshal(jdt, &bp); err != nil {
-			reterr = err
-			return
-		}
+	bp, reterr := parseBarSettings(param)
+	if reterr != nil {
+		return
 	}
 
 	xAxisData, reterr := extractXAxisData(x, y)
@@ -143,9 +148,13 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 		return
 	}
 
-	series, reterr := extractSeries(x, y, DefaultSeries)
+	series, reterr := extractSeries(x, y, DefaultSeries, "bar")
 	if reterr != nil {
 		return
+	}
+
+	if xAxisData == nil {
+		xAxisData = rangeNum(int32(len(series[0].Data)))
 	}
 
 	xAxis := DefaultXAxisCategory(xAxisData)
@@ -171,6 +180,7 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 			YAxis: []*YAxis{
 				DefaultYAxis(),
 			},
+			Color: defaultColorSet,
 		},
 	}
 
