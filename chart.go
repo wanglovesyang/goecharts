@@ -459,6 +459,8 @@ type XAxis struct {
 	AxisLine      *AxisLine   `json:"axisLine,omitempty"`
 	AxisLabel     *AxisLabel  `json:"axisLabel,omitempty"`
 	Data          interface{} `json:"data,omitempty"`
+	Max           interface{} `json:"max,omitempty"`
+	Min           interface{} `json:"min,omitempty"`
 }
 
 type SplitLine struct {

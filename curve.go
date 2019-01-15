@@ -5,7 +5,6 @@ import "encoding/json"
 type CurveSettings struct {
 	Title  string `json:"title"`
 	Smooth bool   `json:"smooth"`
-	Title2 string `json:"title2"`
 }
 
 type CurveSettings2 struct {
