@@ -483,7 +483,7 @@ type AxisLabel struct {
 	TextStyle *TextStyle `json:"textSyle"`
 }
 
-func DefaultXAxisCategory(data interface{}) *XAxis {
+func DefaultXAxis(data interface{}, tp string) *XAxis {
 	return &XAxis{
 		Data:    data,
 		Show:    true,
@@ -494,7 +494,7 @@ func DefaultXAxisCategory(data interface{}) *XAxis {
 		},
 		Inverse:     false,
 		BoundaryGap: true,
-		Type:        "category",
+		Type:        tp,
 		SplitLine: &SplitLine{
 			Show: true,
 		},

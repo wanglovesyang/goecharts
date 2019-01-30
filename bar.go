@@ -148,7 +148,7 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 		return
 	}
 
-	xAxis := DefaultXAxisCategory(xAxisData)
+	xAxis := DefaultXAxis(xAxisData, "category")
 	title := DefaultTitle(bp.Title)
 
 	var displaySeriesNames []string
