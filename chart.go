@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	h "encoding/hex"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -36,10 +37,16 @@ type Chart struct {
 }
 
 func (e *Chart) RenderJupyter() (ret string) {
-	optStr, err := json.Marshal(e.opt)
+	optStrB, err := json.Marshal(e.opt)
 	if err != nil {
 		ret = err.Error()
 		return
+	}
+
+	optStr := string(optStrB)
+	for k, v := range funcmap {
+		sig := fmt.Sprintf("\"$%s$\"", k)
+		optStr = strings.Replace(optStr, sig, v, -1)
 	}
 
 	chartID := time.Now().Format("2006-01-02 15:04:05")
@@ -47,7 +54,7 @@ func (e *Chart) RenderJupyter() (ret string) {
 	chartSig := h.EncodeToString(sm[0:16])
 
 	ret = template
-	ret = strings.Replace(ret, "${chart_opt}", string(optStr), -1)
+	ret = strings.Replace(ret, "${chart_opt}", optStr, -1)
 	ret = strings.Replace(ret, "${chart_id}", chartSig, -1)
 
 	Log(ret)
@@ -316,6 +323,9 @@ type MarkPoint struct {
 	Symbol     string            `json:"symbol,omitempty"`
 	SymbolSize int32             `json:"symbolSize,omitempty"`
 	Label      *SeriesLabelModes `json:"label,omitempty"`
+	Value      TruncFloat        `json:"value,ommitempty"`
+	XAxis      int32             `json:"xAxis,ommitempty"`
+	YAxis      float32           `json:"yAxis,ommitempty"`
 }
 
 type MarkPointModes struct {
@@ -330,10 +340,11 @@ type MarkLine struct {
 type MarkLineModes struct {
 	Data       []MarkLine `json:"data,omitempty"`
 	SymbolSize int32      `json:"symbolSize,omitempty"`
+	Precision  int32      `json:"precision"`
 }
 
-func DefaultSeries(data interface{}, name string, seriesType string) *Series {
-	return &Series{
+func DefaultSeries(data interface{}, name string, seriesType string) (ret *Series) {
+	ret = &Series{
 		Type:        seriesType,
 		Name:        name,
 		Data:        data,
@@ -354,10 +365,23 @@ func DefaultSeries(data interface{}, name string, seriesType string) *Series {
 				},
 			},
 		},
-		MarkPoint: &MarkPointModes{
+		MarkLine: &MarkLineModes{
+			Data: []MarkLine{
+				MarkLine{
+					Type: "average",
+					Name: "mean-value",
+				},
+			},
+			SymbolSize: 10,
+			Precision:  5,
+		},
+	}
+
+	if dataF, suc := data.([]float32); suc {
+		min, max := minMaxFloat32InArray(dataF)
+		ret.MarkPoint = &MarkPointModes{
 			Data: []MarkPoint{
 				MarkPoint{
-					Type:       "max",
 					Name:       "Maximum",
 					Symbol:     "pin",
 					SymbolSize: 50,
@@ -369,9 +393,11 @@ func DefaultSeries(data interface{}, name string, seriesType string) *Series {
 							},
 						},
 					},
+					Value: TruncFloat{dataF[max], 2},
+					XAxis: max,
+					YAxis: dataF[max],
 				},
 				MarkPoint{
-					Type:       "min",
 					Name:       "Minimum",
 					Symbol:     "pin",
 					SymbolSize: 50,
@@ -383,19 +409,15 @@ func DefaultSeries(data interface{}, name string, seriesType string) *Series {
 							},
 						},
 					},
+					Value: TruncFloat{dataF[min], 2},
+					XAxis: min,
+					YAxis: dataF[min],
 				},
 			},
-		},
-		MarkLine: &MarkLineModes{
-			Data: []MarkLine{
-				MarkLine{
-					Type: "average",
-					Name: "mean-value",
-				},
-			},
-			SymbolSize: 10,
-		},
+		}
 	}
+
+	return
 }
 
 /*
@@ -459,8 +481,6 @@ type XAxis struct {
 	AxisLine      *AxisLine   `json:"axisLine,omitempty"`
 	AxisLabel     *AxisLabel  `json:"axisLabel,omitempty"`
 	Data          interface{} `json:"data,omitempty"`
-	Max           interface{} `json:"max,omitempty"`
-	Min           interface{} `json:"min,omitempty"`
 }
 
 type SplitLine struct {
@@ -566,6 +586,8 @@ type YAxis struct {
 	SplitLine     *SplitLine `json:"splitLine,omitempty"`
 	AxisLine      *AxisLine  `json:"axisLine,omitempty"`
 	AxisLabel     *AxisLabel `json:"axisLabel,omitempty"`
+	Max           string     `json:"max,omitempty"`
+	Min           string     `json:"min,omitempty"`
 }
 
 func DefaultYAxis() *YAxis {
@@ -599,6 +621,8 @@ func DefaultYAxis() *YAxis {
 				FontSize: 12,
 			},
 		},
+		Max: LeakMaxFunc(),
+		Min: LeakMinFunc(),
 	}
 }
 
