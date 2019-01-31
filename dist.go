@@ -60,6 +60,9 @@ func renderHistogram(data map[string][]float32, settings *HistogramSettings) (re
 		DefaultLegend(displaySeriesNames),
 	}
 
+	ret = &Chart{
+		opt: opt,
+	}
 	return
 }
 
