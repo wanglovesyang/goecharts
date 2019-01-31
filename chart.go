@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	h "encoding/hex"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -36,10 +37,16 @@ type Chart struct {
 }
 
 func (e *Chart) RenderJupyter() (ret string) {
-	optStr, err := json.Marshal(e.opt)
+	optStrB, err := json.Marshal(e.opt)
 	if err != nil {
 		ret = err.Error()
 		return
+	}
+
+	optStr := string(optStrB)
+	for k, v := range funcmap {
+		sig := fmt.Sprintf("\"$%s$\"", k)
+		optStr = strings.Replace(optStr, sig, v, -1)
 	}
 
 	chartID := time.Now().Format("2006-01-02 15:04:05")
@@ -47,7 +54,7 @@ func (e *Chart) RenderJupyter() (ret string) {
 	chartSig := h.EncodeToString(sm[0:16])
 
 	ret = template
-	ret = strings.Replace(ret, "${chart_opt}", string(optStr), -1)
+	ret = strings.Replace(ret, "${chart_opt}", optStr, -1)
 	ret = strings.Replace(ret, "${chart_id}", chartSig, -1)
 
 	Log(ret)
@@ -316,6 +323,9 @@ type MarkPoint struct {
 	Symbol     string            `json:"symbol,omitempty"`
 	SymbolSize int32             `json:"symbolSize,omitempty"`
 	Label      *SeriesLabelModes `json:"label,omitempty"`
+	Value      TruncFloat        `json:"value,ommitempty"`
+	XAxis      int32             `json:"xAxis,ommitempty"`
+	YAxis      float32           `json:"yAxis,ommitempty"`
 }
 
 type MarkPointModes struct {
@@ -330,9 +340,12 @@ type MarkLine struct {
 type MarkLineModes struct {
 	Data       []MarkLine `json:"data,omitempty"`
 	SymbolSize int32      `json:"symbolSize,omitempty"`
+	Precision  int32      `json:"precision"`
 }
 
 func DefaultSeries(data []float32, name string, seriesType string) *Series {
+	min, max := minMaxFloat32(data)
+
 	return &Series{
 		Type:        seriesType,
 		Name:        name,
@@ -357,7 +370,6 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 		MarkPoint: &MarkPointModes{
 			Data: []MarkPoint{
 				MarkPoint{
-					Type:       "max",
 					Name:       "Maximum",
 					Symbol:     "pin",
 					SymbolSize: 50,
@@ -369,9 +381,11 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 							},
 						},
 					},
+					Value: TruncFloat{data[max], 2},
+					XAxis: max,
+					YAxis: data[max],
 				},
 				MarkPoint{
-					Type:       "min",
 					Name:       "Minimum",
 					Symbol:     "pin",
 					SymbolSize: 50,
@@ -383,6 +397,9 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 							},
 						},
 					},
+					Value: TruncFloat{data[min], 2},
+					XAxis: min,
+					YAxis: data[min],
 				},
 			},
 		},
@@ -394,6 +411,7 @@ func DefaultSeries(data []float32, name string, seriesType string) *Series {
 				},
 			},
 			SymbolSize: 10,
+			Precision:  5,
 		},
 	}
 }
@@ -459,8 +477,6 @@ type XAxis struct {
 	AxisLine      *AxisLine   `json:"axisLine,omitempty"`
 	AxisLabel     *AxisLabel  `json:"axisLabel,omitempty"`
 	Data          interface{} `json:"data,omitempty"`
-	Max           interface{} `json:"max,omitempty"`
-	Min           interface{} `json:"min,omitempty"`
 }
 
 type SplitLine struct {
@@ -485,6 +501,37 @@ type AxisLabel struct {
 	Rotate    float32    `json:"rotate,omitempty"`
 	Margin    float32    `json:"margin,omitempty"`
 	TextStyle *TextStyle `json:"textSyle,omitempty"`
+}
+
+func DefaultXAxisValue(data interface{}) *XAxis {
+	return &XAxis{
+		Data:    data,
+		Show:    true,
+		NameLoc: "middle",
+		NameGap: 25,
+		NameTextStyle: &TextStyle{
+			FontSize: 14,
+		},
+		Inverse:     false,
+		BoundaryGap: true,
+		Type:        "category",
+		SplitLine: &SplitLine{
+			Show: true,
+		},
+		AxisLine: &AxisLine{
+			LineStyle: &LineStyle{
+				Width: 1,
+			},
+		},
+		AxisLabel: &AxisLabel{
+			Interval: "auto",
+			Rotate:   0,
+			Margin:   8,
+			TextStyle: &TextStyle{
+				FontSize: 12,
+			},
+		},
+	}
 }
 
 func DefaultXAxisCategory(data interface{}) *XAxis {
@@ -566,6 +613,8 @@ type YAxis struct {
 	SplitLine     *SplitLine `json:"splitLine,omitempty"`
 	AxisLine      *AxisLine  `json:"axisLine,omitempty"`
 	AxisLabel     *AxisLabel `json:"axisLabel,omitempty"`
+	Max           string     `json:"max,omitempty"`
+	Min           string     `json:"min,omitempty"`
 }
 
 func DefaultYAxis() *YAxis {
@@ -599,6 +648,8 @@ func DefaultYAxis() *YAxis {
 				FontSize: 12,
 			},
 		},
+		Max: LeakMaxFunc(),
+		Min: LeakMinFunc(),
 	}
 }
 
