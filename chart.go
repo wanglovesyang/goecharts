@@ -302,7 +302,7 @@ type SeriesLabel struct {
 type Series struct {
 	Type        string            `json:"type,omitempty"`
 	Name        string            `json:"name,omitempty"`
-	Data        []float32         `json:"data,omitempty"`
+	Data        interface{}       `json:"data,omitempty"`
 	CategoryGap string            `json:"barCategoryGap,omitempty"`
 	Label       *SeriesLabelModes `json:"label,omitempty"`
 	MarkPoint   *MarkPointModes   `json:"markPoint,omitempty"`
@@ -332,7 +332,7 @@ type MarkLineModes struct {
 	SymbolSize int32      `json:"symbolSize,omitempty"`
 }
 
-func DefaultSeries(data []float32, name string, seriesType string) *Series {
+func DefaultSeries(data interface{}, name string, seriesType string) *Series {
 	return &Series{
 		Type:        seriesType,
 		Name:        name,

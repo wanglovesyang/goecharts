@@ -1,6 +1,6 @@
 package goecharts
 
-type SeriesMaker func(val []float32, name string, tp string) *Series
+type SeriesMaker func(val interface{}, name string, tp string) *Series
 
 var defaultColorSet = []string{
 	"#c23531",
@@ -30,7 +30,7 @@ var defaultColorSet = []string{
 	"#f6f5ec",
 }
 
-func SmoothedSeries(data []float32, name string, seriesType string) (ret *Series) {
+func SmoothedSeries(data interface{}, name string, seriesType string) (ret *Series) {
 	ret = DefaultSeries(data, name, seriesType)
 	ret.Smooth = true
 

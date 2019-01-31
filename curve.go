@@ -7,10 +7,6 @@ type CurveSettings struct {
 	Smooth bool   `json:"smooth"`
 }
 
-type CurveSettings2 struct {
-	Title string `json:"title"`
-}
-
 func parseCurveSettings(s interface{}) (ret *CurveSettings, reterr error) {
 	switch a := s.(type) {
 	case CurveSettings:
@@ -60,10 +56,10 @@ func Curve(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 	}
 
 	if xAxisData == nil {
-		xAxisData = rangeNum(int32(len(series[0].Data)))
+		xAxisData = rangeNum(int32(len(series[0].Data.([]float32))))
 	}
 
-	xAxis := DefaultXAxisCategory(xAxisData)
+	xAxis := DefaultXAxis(xAxisData, "category")
 	title := DefaultTitle(bp.Title)
 
 	var displaySeriesNames []string
