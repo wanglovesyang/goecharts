@@ -2,6 +2,16 @@ package goecharts
 
 type SeriesMaker func(val interface{}, name string, tp string) *Series
 
+func TruncatedSeriesMaker(maker SeriesMaker, trunc int32) SeriesMaker {
+	return func(val interface{}, name string, tp string) *Series {
+		if fv, suc := val.([]float32); suc {
+			val = TruncFloatList(fv, trunc)
+		}
+
+		return maker(val, name, tp)
+	}
+}
+
 var defaultColorSet = []string{
 	"#c23531",
 	"#2f4554",

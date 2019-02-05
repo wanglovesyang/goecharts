@@ -3,8 +3,9 @@ package goecharts
 import "encoding/json"
 
 type CurveSettings struct {
-	Title  string `json:"title"`
-	Smooth bool   `json:"smooth"`
+	Title         string `json:"title"`
+	Smooth        bool   `json:"smooth"`
+	TuncPrecision int32  `json:"trunc_precision"`
 }
 
 func parseCurveSettings(s interface{}) (ret *CurveSettings, reterr error) {
@@ -50,6 +51,10 @@ func Curve(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 	if bp.Smooth {
 		curveMaker = SmoothedSeries
 	}
+	if bp.TuncPrecision > 0 {
+		curveMaker = TruncatedSeriesMaker(curveMaker, bp.TuncPrecision)
+	}
+
 	series, reterr := extractSeries(x, y, curveMaker, "line")
 	if reterr != nil {
 		return

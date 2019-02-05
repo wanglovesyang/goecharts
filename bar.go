@@ -9,7 +9,8 @@ import (
 )
 
 type BarSettings struct {
-	Title string `json:"title"`
+	Title          string `json:"title"`
+	TruncPrecision int32  `json:"trunc_precision"`
 }
 
 func parseBarSettings(s interface{}) (ret *BarSettings, reterr error) {
@@ -146,6 +147,11 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 	xAxisData, reterr := extractXAxisData(x, y)
 	if reterr != nil {
 		return
+	}
+
+	maker := DefaultSeries
+	if bp.TruncPrecision > 0 {
+		maker = TruncatedSeriesMaker(maker, bp.TruncPrecision)
 	}
 
 	series, reterr := extractSeries(x, y, DefaultSeries, "bar")

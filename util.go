@@ -58,6 +58,18 @@ func (t *TruncFloat) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(fmtS, t.v)), nil
 }
 
+func TruncFloatList(s []float32, trunc int32) (ret []TruncFloat) {
+	ret = make([]TruncFloat, len(s))
+	for i, ss := range s {
+		ret[i] = TruncFloat{
+			v:     ss,
+			trunc: trunc,
+		}
+	}
+
+	return
+}
+
 func histgoram(data []float32, binSize int32, norm bool) (ret []float32, axis []float32) {
 	ret = make([]float32, binSize)
 	axis = make([]float32, binSize+1)
@@ -89,7 +101,7 @@ func histgoram(data []float32, binSize int32, norm bool) (ret []float32, axis []
 	return
 }
 
-func alignedHistogram(data map[string][]float32, binSize int32) (ret map[string][]float32, axis []float32) {
+func alignedHistogram(data map[string][]float32, binSize int32, normalize bool) (ret map[string][]float32, axis []float32) {
 	var min, max float32 = math.MaxFloat32, -math.MaxFloat32
 	for _, l := range data {
 		minID, maxID := minMaxFloat32InArray(l)
@@ -122,10 +134,12 @@ func alignedHistogram(data map[string][]float32, binSize int32) (ret map[string]
 		ret[k] = rv
 	}
 
-	for k, rv := range ret {
-		norm := float32(len(data[k]))
-		for i, v := range rv {
-			rv[i] = v / norm
+	if normalize {
+		for k, rv := range ret {
+			norm := float32(len(data[k]))
+			for i, v := range rv {
+				rv[i] = v / norm
+			}
 		}
 	}
 

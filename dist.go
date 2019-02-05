@@ -8,9 +8,10 @@ import (
 )
 
 type HistogramSettings struct {
-	BinSize   int32  `json:"bin_size"`
-	Normalize bool   `json:"normalize"`
-	Title     string `json:"title"`
+	BinSize        int32  `json:"bin_size"`
+	Normalize      bool   `json:"normalize"`
+	Title          string `json:"title"`
+	TruncPrecision int32  `json:"trunc_precision"`
 }
 
 func parseHistogramSettings(s interface{}) (ret *HistogramSettings, reterr error) {
@@ -48,7 +49,12 @@ func renderHistogram(data map[string][]float32, settings *HistogramSettings) (re
 		Color: defaultColorSet,
 	}
 
-	hist, axis := alignedHistogram(data, settings.BinSize)
+	maker := DefaultSeries
+	if settings.TruncPrecision > 0 {
+		maker = TruncatedSeriesMaker(maker, settings.TruncPrecision)
+	}
+
+	hist, axis := alignedHistogram(data, settings.BinSize, settings.Normalize)
 	opt.XAxis = []*XAxis{DefaultXAxis(axis, "category")}
 	for k, h := range hist {
 		series := DefaultSeries(h, k, "bar")
