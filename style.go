@@ -1,17 +1,13 @@
 package goecharts
 
-import "log"
-
 type SeriesMaker func(val interface{}, name string, tp string) *Series
 
 func TruncatedSeriesMaker(maker SeriesMaker, trunc int32) SeriesMaker {
 	return func(val interface{}, name string, tp string) *Series {
 		if fv, suc := val.([]float32); suc {
-			log.Printf("conducting truncating")
 			val = TruncFloatList(fv, trunc)
 		}
 
-		log.Printf("val = %v", val)
 		return maker(val, name, tp)
 	}
 }

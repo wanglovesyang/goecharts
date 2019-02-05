@@ -57,7 +57,7 @@ func renderHistogram(data map[string][]float32, settings *HistogramSettings) (re
 	hist, axis := alignedHistogram(data, settings.BinSize, settings.Normalize)
 	opt.XAxis = []*XAxis{DefaultXAxis(axis, "category")}
 	for k, h := range hist {
-		series := DefaultSeries(h, k, "bar")
+		series := maker(h, k, "bar")
 		opt.Series = append(opt.Series, series)
 		displaySeriesNames = append(displaySeriesNames, k)
 	}
