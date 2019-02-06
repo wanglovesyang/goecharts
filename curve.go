@@ -7,6 +7,7 @@ type CurveSettings struct {
 	Smooth         bool   `json:"smooth"`
 	TruncPrecision int32  `json:"trunc_precision"`
 	HideMarkPoint  bool   `json:"hide_markpoint"`
+	HideMarkLine   bool   `json:"hide_markline"`
 }
 
 func parseCurveSettings(s interface{}) (ret *CurveSettings, reterr error) {
@@ -59,6 +60,10 @@ func Curve(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 
 	if !bp.HideMarkPoint {
 		curveMaker = SeriesMakerWithMarkPoint(curveMaker, bp.TruncPrecision)
+	}
+
+	if !bp.HideMarkLine {
+		curveMaker = SeriesMakerWithMarkLine(curveMaker, bp.TruncPrecision)
 	}
 
 	series, reterr := extractSeries(x, y, curveMaker, "line")

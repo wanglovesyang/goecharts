@@ -63,6 +63,23 @@ func SeriesMakerWithMarkPoint(maker SeriesMaker, trunc int32) SeriesMaker {
 	}
 }
 
+func SeriesMakerWithMarkLine(maker SeriesMaker, trunc int32) SeriesMaker {
+	return func(val interface{}, tp, name string) (ret *Series) {
+		ret = maker(val, tp, name)
+		ret.MarkLine = &MarkLineModes{
+			Data: []MarkLine{
+				MarkLine{
+					Type: "average",
+					Name: "mean-value",
+				},
+			},
+			SymbolSize: 10,
+			Precision:  trunc,
+		}
+		return
+	}
+}
+
 var defaultColorSet = []string{
 	"#c23531",
 	"#2f4554",

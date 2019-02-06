@@ -365,16 +365,6 @@ func DefaultSeries(data interface{}, name string, seriesType string) (ret *Serie
 				},
 			},
 		},
-		MarkLine: &MarkLineModes{
-			Data: []MarkLine{
-				MarkLine{
-					Type: "average",
-					Name: "mean-value",
-				},
-			},
-			SymbolSize: 10,
-			Precision:  5,
-		},
 	}
 
 	return
