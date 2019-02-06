@@ -3,10 +3,10 @@ package goecharts
 import "encoding/json"
 
 type CurveSettings struct {
-	Title         string `json:"title"`
-	Smooth        bool   `json:"smooth"`
-	TuncPrecision int32  `json:"trunc_precision"`
-	HideMarkPoint bool   `json:"hide_markpoint"`
+	Title          string `json:"title"`
+	Smooth         bool   `json:"smooth"`
+	TruncPrecision int32  `json:"trunc_precision"`
+	HideMarkPoint  bool   `json:"hide_markpoint"`
 }
 
 func parseCurveSettings(s interface{}) (ret *CurveSettings, reterr error) {
@@ -53,12 +53,12 @@ func Curve(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 		curveMaker = SmoothedSeries
 	}
 
-	if bp.TuncPrecision > 0 {
-		curveMaker = TruncatedSeriesMaker(curveMaker, bp.TuncPrecision)
+	if bp.TruncPrecision > 0 {
+		curveMaker = TruncatedSeriesMaker(curveMaker, bp.TruncPrecision)
 	}
 
 	if !bp.HideMarkPoint {
-		curveMaker = SeriesMakerWithMarkPoint(curveMaker, bp.TuncPrecision)
+		curveMaker = SeriesMakerWithMarkPoint(curveMaker, bp.TruncPrecision)
 	}
 
 	series, reterr := extractSeries(x, y, curveMaker, "line")
