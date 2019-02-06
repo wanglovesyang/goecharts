@@ -11,6 +11,7 @@ import (
 type BarSettings struct {
 	Title          string `json:"title"`
 	TruncPrecision int32  `json:"trunc_precision"`
+	HideMarkPoint  bool   `json:"hide_markpoint"`
 }
 
 func parseBarSettings(s interface{}) (ret *BarSettings, reterr error) {
@@ -152,6 +153,10 @@ func Bar(x interface{}, y interface{}, param interface{}) (ret *Chart) {
 	maker := DefaultSeries
 	if bp.TruncPrecision > 0 {
 		maker = TruncatedSeriesMaker(maker, bp.TruncPrecision)
+	}
+
+	if !bp.HideMarkPoint {
+		maker = SeriesMakerWithMarkPoint(maker, bp.TruncPrecision)
 	}
 
 	series, reterr := extractSeries(x, y, DefaultSeries, "bar")

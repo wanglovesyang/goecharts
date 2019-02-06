@@ -110,8 +110,6 @@ func alignedHistogram(data map[string][]float32, binSize int32, normalize bool) 
 		max = maxFloat32(max, maxV)
 	}
 
-	fmt.Fprintf(os.Stderr, "min = %f, max = %f\n", min, max)
-
 	binStride := (max - min) / float32(binSize)
 
 	getId := func(v float32) int32 {

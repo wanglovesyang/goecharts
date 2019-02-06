@@ -377,46 +377,6 @@ func DefaultSeries(data interface{}, name string, seriesType string) (ret *Serie
 		},
 	}
 
-	if dataF, suc := data.([]float32); suc {
-		min, max := minMaxFloat32InArray(dataF)
-		ret.MarkPoint = &MarkPointModes{
-			Data: []MarkPoint{
-				MarkPoint{
-					Name:       "Maximum",
-					Symbol:     "pin",
-					SymbolSize: 50,
-					Label: &SeriesLabelModes{
-						Normal: &SeriesLabel{
-							Show: true,
-							TextStyle: TextStyle{
-								Color: "#fff",
-							},
-						},
-					},
-					Value: TruncFloat{dataF[max], 2},
-					XAxis: max,
-					YAxis: dataF[max],
-				},
-				MarkPoint{
-					Name:       "Minimum",
-					Symbol:     "pin",
-					SymbolSize: 50,
-					Label: &SeriesLabelModes{
-						Normal: &SeriesLabel{
-							Show: true,
-							TextStyle: TextStyle{
-								Color: "#fff",
-							},
-						},
-					},
-					Value: TruncFloat{dataF[min], 2},
-					XAxis: min,
-					YAxis: dataF[min],
-				},
-			},
-		}
-	}
-
 	return
 }
 

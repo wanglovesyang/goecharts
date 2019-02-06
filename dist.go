@@ -12,6 +12,7 @@ type HistogramSettings struct {
 	Normalize      bool   `json:"normalize"`
 	Title          string `json:"title"`
 	TruncPrecision int32  `json:"trunc_precision"`
+	HideMarkPoint  bool   `json:"hide_markpoint"`
 }
 
 func parseHistogramSettings(s interface{}) (ret *HistogramSettings, reterr error) {
@@ -52,6 +53,10 @@ func renderHistogram(data map[string][]float32, settings *HistogramSettings) (re
 	maker := DefaultSeries
 	if settings.TruncPrecision > 0 {
 		maker = TruncatedSeriesMaker(maker, settings.TruncPrecision)
+	}
+
+	if !settings.HideMarkPoint {
+		maker = SeriesMakerWithMarkPoint(maker, settings.TruncPrecision)
 	}
 
 	hist, axis := alignedHistogram(data, settings.BinSize, settings.Normalize)

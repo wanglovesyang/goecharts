@@ -12,6 +12,57 @@ func TruncatedSeriesMaker(maker SeriesMaker, trunc int32) SeriesMaker {
 	}
 }
 
+func SeriesMakerWithMarkPoint(maker SeriesMaker, trunc int32) SeriesMaker {
+	if trunc == 0 {
+		trunc = 6
+	}
+
+	return func(val interface{}, name string, tp string) (ret *Series) {
+		ret = maker(val, name, tp)
+		if dataF, suc := val.([]float32); suc {
+			min, max := minMaxFloat32InArray(dataF)
+			ret.MarkPoint = &MarkPointModes{
+				Data: []MarkPoint{
+					MarkPoint{
+						Name:       "Maximum",
+						Symbol:     "pin",
+						SymbolSize: 50,
+						Label: &SeriesLabelModes{
+							Normal: &SeriesLabel{
+								Show: true,
+								TextStyle: TextStyle{
+									Color: "#fff",
+								},
+							},
+						},
+						Value: TruncFloat{dataF[max], trunc},
+						XAxis: max,
+						YAxis: dataF[max],
+					},
+					MarkPoint{
+						Name:       "Minimum",
+						Symbol:     "pin",
+						SymbolSize: 50,
+						Label: &SeriesLabelModes{
+							Normal: &SeriesLabel{
+								Show: true,
+								TextStyle: TextStyle{
+									Color: "#fff",
+								},
+							},
+						},
+						Value: TruncFloat{dataF[min], trunc},
+						XAxis: min,
+						YAxis: dataF[min],
+					},
+				},
+			}
+		}
+
+		return
+	}
+}
+
 var defaultColorSet = []string{
 	"#c23531",
 	"#2f4554",
